@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from MoorePenrose import MoorePenrose
+from Dilation2d import Dilation2d
 
 class MCNN(nn.Module):
     def __init__(self):
@@ -11,6 +12,7 @@ class MCNN(nn.Module):
         # Layer operations
         self.conv1 = nn.Conv2d(1, 15, kernel_size=5, padding=1)
         self.conv2 = nn.Conv2d(15, 210, kernel_size=5, padding=1)
+        self.dil1 = Dilation2d(1, 15, kernel_size=5, padding=1)
         self.fc2 = nn.Linear(36*210, 10, bias=False)
         
         self.op_weights = []
@@ -74,7 +76,7 @@ class MCNN(nn.Module):
         self.arreange_optimal_weights(optimal_weights,shape)
         
         # First trained layer
-        x = self.conv1(x)
+        x = self.dil1(x) # temporal change self.conv1(x) --> self.dil1
         x = F.relu(x)
         x = F.max_pool2d(x,kernel_size=2)
         
@@ -87,6 +89,7 @@ class MCNN(nn.Module):
         self.arreange_optimal_weights(optimal_weights,shape)
         
         # Second trained layer
+        par = list(self.parameters())
         x = self.conv2(x)
         x = F.relu(x)
         x = F.max_pool2d(x,kernel_size=2)
@@ -114,7 +117,7 @@ class MCNN(nn.Module):
     
     def forward(self, x):
         nn.Conv2d.weight = self.op_weights[0]
-        x = self.conv1(x)
+        x = self.dil1(x) # temporal change self.conv1(x) --> self.dil1(x)
         x = F.relu(x)
         x = F.max_pool2d(x,kernel_size=2)
         

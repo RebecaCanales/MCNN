@@ -21,10 +21,7 @@ class Morph2d(nn.Module):
     - Sequence (opening, closing)
     - Subtraction (subtract any two pair of operations)
     
-    PENDINGS:
-    - It does not deal with subtraction of componsed operations yet.
-    - The errors are printed but do not stop the operations
-    - It does not deal with openings and closing at the same time."""
+    It does not deal with subtraction of componsed operations yet. """
     
     def __init__(self, in_channels, 
                  out_channels, 
@@ -60,7 +57,7 @@ class Morph2d(nn.Module):
         if convolution:
           self.conv = nn.Conv2d(in_channels, partial_out_channels, kernel_size, padding="same").double()
 
-        if sequence:
+        if sequence: # Revisar condición
           if sequence[0] == "dilation":
             self.dil_seq = Dilation2d(in_channels, partial_out_channels, kernel_size, soft_max=True, beta=20)
             self.er_seq = Erosion2d(partial_out_channels, partial_out_channels, kernel_size, soft_max=True, beta=20)
@@ -109,9 +106,13 @@ class Morph2d(nn.Module):
           
           self.subtraction_components = components
 
+
+        # Define different kernel_size for the layers
+
     def forward(self, x):
 
       initial_out = torch.Tensor([])
+      out = torch.Tensor([])
 
       if self.dilation:
         dil_out = self.dil(x)
@@ -131,7 +132,7 @@ class Morph2d(nn.Module):
         else:
           out = torch.cat((out, conv_out),1)
 
-      if self.sequence:
+      if self.sequence: # Revisar condición
         if self.sequence[0] == "dilation" and self.sequence[1] == "erosion":
           seq_out = self.dil_seq(x)
           seq_out = self.er_seq(seq_out)
@@ -163,6 +164,7 @@ class Morph2d(nn.Module):
       
       return out
 
+
 class Morphology(nn.Module):
     '''
     Base class for morpholigical operators 
@@ -185,7 +187,9 @@ class Morphology(nn.Module):
         self.beta = beta
         self.type = type
 
-        self.weight = nn.Parameter(torch.zeros(out_channels, in_channels, kernel_size, kernel_size), requires_grad=True)
+        aux_weight = torch.zeros(out_channels, in_channels, kernel_size, kernel_size)
+        aux_weight = nn.init.kaiming_uniform_(aux_weight, mode='fan_in', nonlinearity='relu')
+        self.weight = nn.Parameter(aux_weight, requires_grad=True) # Alternative: nn.init.kaiming_uniform_(w, mode='fan_in', nonlinearity='relu') to fill a tensor
         self.unfold = nn.Unfold(kernel_size, dilation=1, padding=0, stride=1)
 
     def forward(self, x):
