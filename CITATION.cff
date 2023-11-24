@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Hybrid Morphological-Convolutional Neural Network
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Martha Rebeca
+    family-names: Canales-Fiscal
+    email: marthar.canales@tec.mx
+    affiliation: >-
+      Instituto Tecnológico y de Estudios Superiores de
+      Monterrey
+    orcid: 'https://orcid.org/0000-0003-2958-3556'
+identifiers:
+  - type: url
+    value: 'https://github.com/RebecaCanales/MCNN.git'
+repository-code: 'https://github.com/RebecaCanales/MCNN.git'
+abstract: >-
+  This repository contains a morphological-convolutional
+  neural network (MCNN) trained with extreme learning
+  machine (ELM)
+
+
+  The convolutional and morphological layers are trained
+  using the first part of the approach proposed by Khellal
+  et al in "Convolutional Neural Network Based on Extreme
+  Learning Machine for Maritime Ships Recognition in
+  Infrared Images", Sensors 2018, 18, 1490;
+  doi:10.3390/s18051490
